@@ -3,6 +3,3 @@ __pycache__/
 .pytest_cache/
 reports/
 logs/
-*.log
-*.png
-.env
