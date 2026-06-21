@@ -2,6 +2,7 @@ import pytest
 
 from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
+from utils.data_reader import obtener_casos_login
 from utils.logger import logger
 
 
@@ -13,10 +14,8 @@ def test_login_exitoso(driver):
     login_page = LoginPage(driver)
     inventory_page = InventoryPage(driver)
 
-    logger.info("Ingresando con usuario standard_user")
     login_page.login("standard_user", "secret_sauce")
 
-    logger.info("Validando acceso al inventario")
     assert "inventory.html" in driver.current_url
     assert inventory_page.obtener_titulo() == "Products"
     assert inventory_page.obtener_cantidad_productos() > 0
@@ -25,19 +24,44 @@ def test_login_exitoso(driver):
 
 
 @pytest.mark.ui
-def test_login_usuario_bloqueado(driver):
-    logger.info("Iniciando test_login_usuario_bloqueado")
+@pytest.mark.parametrize(
+    "usuario,password,resultado_esperado",
+    obtener_casos_login()
+)
+def test_login_con_datos_csv(
+    driver,
+    usuario,
+    password,
+    resultado_esperado
+):
+    logger.info(
+        "Ejecutando login parametrizado con usuario %s",
+        usuario
+    )
 
     login_page = LoginPage(driver)
+    inventory_page = InventoryPage(driver)
 
-    logger.info("Intentando ingresar con locked_out_user")
-    login_page.login("locked_out_user", "secret_sauce")
+    login_page.login(usuario, password)
 
-    mensaje_error = login_page.obtener_mensaje_error()
+    if resultado_esperado == "success":
+        assert "inventory.html" in driver.current_url
+        assert inventory_page.obtener_titulo() == "Products"
 
-    logger.info("Validando mensaje de usuario bloqueado")
-    assert "locked out" in mensaje_error.lower()
+    elif resultado_esperado == "locked":
+        mensaje_error = login_page.obtener_mensaje_error()
 
-    logger.info(
-        "test_login_usuario_bloqueado finalizado correctamente"
-    )
+        assert "locked out" in mensaje_error.lower()
+
+    elif resultado_esperado == "error":
+        mensaje_error = login_page.obtener_mensaje_error()
+
+        assert "username and password do not match" in (
+            mensaje_error.lower()
+        )
+
+    else:
+        pytest.fail(
+            f"Resultado esperado no reconocido: "
+            f"{resultado_esperado}"
+        )
