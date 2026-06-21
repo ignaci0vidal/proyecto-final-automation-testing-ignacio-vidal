@@ -1,17 +1,11 @@
 import pathlib
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-
+from utils.driver_factory import crear_driver
 from utils.logger import logger
 
 
 def before_scenario(context, scenario):
-    options = Options()
-    options.add_argument("--start-maximized")
-
-    context.driver = webdriver.Chrome(options=options)
-    context.driver.implicitly_wait(5)
+    context.driver = crear_driver()
 
     logger.info(
         "Iniciando escenario BDD: %s",
@@ -29,9 +23,15 @@ def after_scenario(context, scenario):
             exist_ok=True
         )
 
+        nombre_archivo = (
+            scenario.name
+            .replace(" ", "_")
+            .replace("/", "_")
+        )
+
         screenshot_path = (
             screenshots_dir
-            / f"{scenario.name.replace(' ', '_')}.png"
+            / f"{nombre_archivo}.png"
         )
 
         context.driver.save_screenshot(
@@ -39,7 +39,8 @@ def after_scenario(context, scenario):
         )
 
         logger.error(
-            "Escenario BDD fallido. Captura guardada en %s",
+            "Escenario BDD fallido. "
+            "Captura guardada en %s",
             screenshot_path
         )
 
