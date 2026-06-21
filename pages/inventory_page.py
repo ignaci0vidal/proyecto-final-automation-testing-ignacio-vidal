@@ -6,8 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 class InventoryPage:
     TITLE = (By.CLASS_NAME, "title")
     INVENTORY_ITEMS = (By.CLASS_NAME, "inventory_item")
-    ADD_BACKPACK_BUTTON = (By.ID, "add-to-cart-sauce-labs-backpack")
+    ADD_BACKPACK_BUTTON = (
+        By.ID,
+        "add-to-cart-sauce-labs-backpack"
+    )
     CART_BADGE = (By.CLASS_NAME, "shopping_cart_badge")
+    CART_LINK = (By.CLASS_NAME, "shopping_cart_link") #identifica el ícono del carrito.
 
     def __init__(self, driver):
         self.driver = driver
@@ -21,18 +25,32 @@ class InventoryPage:
 
     def obtener_cantidad_productos(self):
         productos = self.wait.until(
-            EC.visibility_of_all_elements_located(self.INVENTORY_ITEMS)
+            EC.visibility_of_all_elements_located(
+                self.INVENTORY_ITEMS
+            )
         )
         return len(productos)
 
     def agregar_backpack_al_carrito(self):
         boton = self.wait.until(
-            EC.element_to_be_clickable(self.ADD_BACKPACK_BUTTON)
+            EC.element_to_be_clickable(
+                self.ADD_BACKPACK_BUTTON
+            )
         )
         boton.click()
 
     def obtener_cantidad_carrito(self):
         badge = self.wait.until(
-            EC.visibility_of_element_located(self.CART_BADGE)
+            EC.visibility_of_element_located(
+                self.CART_BADGE
+            )
         )
         return badge.text
+
+    def abrir_carrito(self):
+        carrito = self.wait.until(
+            EC.element_to_be_clickable(
+                self.CART_LINK
+            )
+        )
+        carrito.click()
