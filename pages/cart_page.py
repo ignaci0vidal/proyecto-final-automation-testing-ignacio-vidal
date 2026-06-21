@@ -37,3 +37,9 @@ class CartPage:
             )
         )
         boton.click()
+
+        self.wait.until(
+            EC.invisibility_of_element_located(
+                self.REMOVE_BACKPACK_BUTTON
+            )
+        )

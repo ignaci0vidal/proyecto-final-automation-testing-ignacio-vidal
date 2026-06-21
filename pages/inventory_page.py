@@ -11,7 +11,7 @@ class InventoryPage:
         "add-to-cart-sauce-labs-backpack"
     )
     CART_BADGE = (By.CLASS_NAME, "shopping_cart_badge")
-    CART_LINK = (By.CLASS_NAME, "shopping_cart_link") #identifica el ícono del carrito.
+    CART_LINK = (By.CLASS_NAME, "shopping_cart_link")
 
     def __init__(self, driver):
         self.driver = driver
@@ -19,7 +19,9 @@ class InventoryPage:
 
     def obtener_titulo(self):
         titulo = self.wait.until(
-            EC.visibility_of_element_located(self.TITLE)
+            EC.visibility_of_element_located(
+                self.TITLE
+            )
         )
         return titulo.text
 
@@ -54,3 +56,7 @@ class InventoryPage:
             )
         )
         carrito.click()
+
+        self.wait.until(
+            EC.url_contains("cart.html")
+        )
